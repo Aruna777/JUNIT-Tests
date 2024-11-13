@@ -1,19 +1,34 @@
 package com.example.Testing;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
 
 public class UserServiceTest {
-    private final UserService userService = new UserService();
+    @Mock
+    private UserRepository userRepository;
 
+    @InjectMocks
+    private UserService userService;
+
+    @BeforeEach
+    public void setUp(){
+        MockitoAnnotations.openMocks(this);
+    }
     @Test
-    void getUserByIdTest() throws IllegalAccessException {
-        User user = userService.getUserById(1);
-        assertAll("User Properties",
-                ()-> assertNotNull(user),
-                ()-> assertEquals(1, user.getId()),
-                ()->assertEquals("John Doe", user.getName()));
+    public void testGetById(){
+        User mockUser = new User(1, "John Doe");
+        when(userRepository.findById(1)).thenReturn(Optional.of(mockUser));
+        Optional<User> result = userService.getUserById(1);
+        assertEquals(Optional.of(mockUser), result);
+        verify(userRepository, times(1)).findById(1);
 
     }
+
 }
